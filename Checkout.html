@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>結帳頁面</title>
+    <link rel="icon" href="./img/logo.svg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+</head>
+
+<body>
+    <header class=" text-white text-center py-3">
+        <h1>結帳</h1>
+    </header>
+
+    <main class="container mt-4">
+        <!-- <h2 class="mb-4">確認您的商品與配送資訊</h2> -->
+        <h2 class="mb-4">確認您購物車的商品</h2>
+
+        <!-- 顯示購物車內容 -->
+        <section class="cart-summary mb-4">
+            <table class="table table-bordered bg-white">
+                <thead>
+                    <tr>
+                        <th>商品名稱</th>
+                        <th>單價</th>
+                        <th>數量</th>
+                        <th>小計</th>
+                    </tr>
+                </thead>
+                <tbody id="cart-summary-items">
+                    <!-- JavaScript 動態生成 -->
+                </tbody>
+            </table>
+            <p class="text-end fw-bold">總金額: NT$<span id="total-price">0</span></p>
+        </section>
+
+        <!-- 配送資訊 -->
+        <!-- <section class="row mb-4">
+            <h3>配送資訊</h3>
+            <form id="checkout-form" class="row">
+            
+                <div class="col-sm-12 col-md-4">
+                    <label for="fullName" class="form-label">姓名</label>
+                    <input type="text" class="form-control" id="fullName" required>
+                </div>
+                
+                <div class="col-sm-12 col-md-4">
+                    <label for="email" class="form-label">電子郵件</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+            
+                <div class="col-sm-12 col-md-4">
+                    <label for="phone" class="form-label">電話</label>
+                    <input type="tel" class="form-control" id="phone" required>
+                </div>
+            
+                <div class="col-12">
+                    <label for="address" class="form-label">地址</label>
+                    <input type="text" class="form-control" id="address" required>
+                </div>
+            </form>
+        </section> -->
+
+
+        <!-- 結帳按鈕 -->
+        <div class="text-end">
+            <a href="./products.html"><button class="btn btn-secondary" id="backtocart">返回購物車</button></a>
+            <!-- <button class="btn btn-secondary" id="backtocart">返回購物車</button> -->
+            <button class="btn btnA checkout" id="place-order">提交訂單</button>
+
+        </div>
+    </main>
+
+    <script>
+        $(document).ready(function () {
+            // 從 localStorage 加載購物車資料
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const $cartSummaryItems = $('#cart-summary-items');
+            let totalPrice = 0;
+
+            // 渲染購物車內容
+            cart.forEach(item => {
+                const quantity = parseInt(item.quantity, 10) || 0;
+                const price = parseInt(item.price, 10) || 0;
+                const subtotal = price * quantity;
+                totalPrice += subtotal;
+
+                $cartSummaryItems.append(`
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>NT$${price}</td>
+                        <td>${quantity}</td>
+                        <td>NT$${subtotal}</td>
+                        
+                    </tr>
+                `);
+            });
+
+            // 更新總金額
+            $('#total-price').text(totalPrice);
+
+            //返回購物車
+            $('#backtocart').on('click', function () {
+                alert('返回購物車按鈕被點擊');
+                window.location.href = './products.html'; // 確認目標路徑
+            });
+
+
+            // 提交訂單
+            $('#place-order').on('click', function () {
+                const name = $('#fullName').val();
+                const email = $('#email').val();
+                const address = $('#address').val();
+                const phone = $('#phone').val();
+
+                if (!name || !email || !address || !phone) {
+                    alert('請完整填寫配送資訊！');
+                    return;
+                }
+
+                alert('感謝您的訂單，我們會盡快配送！');
+                localStorage.removeItem('cart'); // 清空購物車
+                window.location.href = './thankyou.html'; // 跳轉到感謝頁面
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const cartSummaryContainer = document.querySelector('#cart-summary-items');
+            const totalPriceElement = document.querySelector('#total-price');
+            const cart = JSON.parse(localStorage.getItem('cart')) || {};
+            let total = 0;
+
+            // 渲染購物車內容
+            for (const id in cart) {
+                const { name, price, quantity } = cart[id];
+                total += price * quantity;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+            <td>${name}</td>
+            <td>NT$${price}</td>
+            <td>${quantity}</td>
+            <td>NT$${price * quantity}</td>
+            
+        `;
+                cartSummaryContainer.appendChild(row);
+            }
+
+            // 更新總金額
+            totalPriceElement.textContent = total;
+
+            // 提交訂單清空購物車
+            const checkoutButton = document.querySelector('#place-order');
+            checkoutButton.addEventListener('click', () => {
+                alert('感謝您的訂單！');
+                localStorage.removeItem('cart'); // 清空購物車
+                window.location.href = './thankyou.html'; // 跳轉到感謝頁面
+            });
+        });
+
+    </script>
+</body>
+
+</html>
